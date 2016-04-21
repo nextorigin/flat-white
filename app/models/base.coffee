@@ -1,13 +1,18 @@
-mongoose = require "mongoose"
-{extend} = require "../../lib/utils"
+CouchModel = require "spine-couch"
 
 
-class BaseModel
-  @init: (@db) ->
-    @schema = mongoose.Schema @config
-    extend @schema.statics, @statics if @statics
-    extend @schema.methods, @methods if @methods
-    @Store = @db.model @name, @schema
+class Base extends CouchModel
+  @parseConfig: (config, server = {}) ->
+    settings = ["host", "port", "database"]
+    server[setting] = config["db_#{setting}"] for setting in settings
+    server.auth =
+      username: config.db_username
+      password: config.db_password
+    server
+
+  @setup: (config) ->
+    server = @parseConfig config
+    super server
 
 
-module.exports = BaseModel
+module.exports = Base

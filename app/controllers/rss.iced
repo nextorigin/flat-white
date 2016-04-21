@@ -1,21 +1,28 @@
-exports.index = (req, res) ->
-  RSS   = require "rss"
-  Core  = require "../models/core"
-  error = (err) -> res.render '500', pageTitle: "Error: #{err}"
-  feed  = new RSS
-    title: core.config.blog_title
-    description: core.config.blog_description
-    feed_url: core.config.feed_url
-    site_url: core.config.site_url
-    image_url: core.config.site_image_url
-    author: core.config.site_author
+RSS    = require "rss"
+errify = require "errify"
 
-  await Core.Post.find().exec defer err, posts
-  return error err if err
 
-  posts.map (post) -> feed.item
-    title: post.title
-    url:   "#{core.config.site_url}/#{post.urlid}"
+class RssController
+  constructor: (@config) ->
 
-  res.contentType "rss"
-  res.send feed.xml()
+  index: (req, res, next) ->
+    Post  = require "../models/post"
+    feed  = new RSS
+      title:       @config.blog_title
+      description: @config.blog_description
+      feed_url:    @config.feed_url
+      site_url:    @config.site_url
+      image_url:   @config.site_image_url
+      author:      @config.site_author
+
+    await Post.findAll ideally defer posts
+    for post in posts
+      feed.item
+        title: post.title
+        url:   "#{@config.site_url}/#{post.id}"
+
+    res.type "rss"
+    res.send feed.xml()
+
+
+module.exports = RssController

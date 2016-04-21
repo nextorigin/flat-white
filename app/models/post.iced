@@ -1,53 +1,59 @@
+errify = require "errify"
 Base   = require "./base"
-{trim} = require "../../lib/utils"
+utils  = require "../utils"
+extend = (require "util")._extend
 
 
 class Post extends Base
-  @name: "Post"
+  @configure "Post",
+    "title",
+    "body",
+    "tags",
+    "date"
 
-  @config:
-    urlid:
-      type: String
-      index: unique: true
-    title: String
-    body: String
-    tags: String
-    date: Date
+  @findAllByDate: (limit, options, cb) =>
+    selection = {limit, include_docs: true, descending: true}
+    extend selection, options
+    @db.view "app/postsByDate", selection, cb
 
-  @statics:
-    postsByDate: (num, autocb) =>
-      await @Store.find().sort('-date').limit(num).exec defer err, posts
-      return err if err
-      posts
+  @tags: (cb) =>
+    ideally = errify cb
+    await @db.view "app/tags", {group: true}, ideally defer rows
+    tags = (row.key for row in rows)
+    cb null, tags
 
-    tags: (autocb) =>
-      await @Store.find().select('tags').exec defer err, tags
-      return err if err
-      return unless tags
+  @findAll: (options = {}, cb = ->) ->
+    (cb = options) and options = {} if typeof options is "function"
+    ideally = errify cb
+    selection = key: @className, include_docs: true, reduce: false
+    extend selection, options
 
-      filtered_tags = []
-      for tag in tags when tag.tags
-        for tag2 in (tag.tags.split ',') when (tag2 = (trim tag2).toUpperCase()) and tag2 not in filtered_tags
-          filtered_tags.push tag2
+    await @db.view "app/byType", selection, ideally defer rows
+    cb null, @makeRecords rows
 
-    postsByTag: (tag, autocb) =>
-      tag = new RegExp(tag, 'i') unless tag instanceof RegExp
+  @findAllByTag: (tag, options, cb) =>
+    selection = key: tag
+    extend selection, options
+    @db.view "app/tags", selection, cb
 
-      await @Store.where('tags', tag).sort('-date').exec defer err, posts
-      return err if err
-      posts
+  @findAllByKeyword: (keyword, options, cb) =>
+    selection = selector: $text: keyword
+    extend selection, options
+    @db.post "_find", selection, cb
 
-    postsByKeyword: (keyword, autocb) =>
-      keyword = new RegExp(keyword, 'i') unless keyword instanceof RegExp
+  constructor: (attrs = {}) ->
+    attrs.id   = utils.doDashes attrs.title or ""
+    attrs.date = (new Date).toISOString()
+    super attrs
 
-      filter = $or: [
-        {title: keyword}
-        {body:  keyword}
-      ]
+  update: ->
+    @id = utils.doDashes @title
+    super
 
-      await @Store.find(filter).sort('-date').exec defer err, posts
-      return err if err
-      posts
+  save: ->
+    @tags = @tags.split "," if @tags and not Array.isArray @tags
+    @tags[i] = tag.trim().toLowerCase() for tag, i in @tags
+    super
 
 
 module.exports = Post

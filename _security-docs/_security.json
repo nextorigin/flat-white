@@ -1,0 +1,11 @@
+{
+  "couchdb_auth_only": true,
+  "members": {
+    "names": [],
+    "roles": ["blog"]
+  },
+  "admins": {
+    "names": [],
+    "roles": ["admin"]
+  }
+}

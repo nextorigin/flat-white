@@ -44,4 +44,4 @@ make test
 
 ## TODO
 - Media management in administration interface
-- Get test coverage better
+- Get test coverage betternodejs_blog

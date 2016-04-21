@@ -1,17 +1,36 @@
-exports.login = (req, res) ->
-  req.session.userid = null
-  res.render 'sessions/new', pageTitle: 'Login', notice: ''
+passport       = require "passport"
+CouchStrategy  = require "passport-couch"
+Base           = require "../models/base"
 
-exports.logout = (req, res) ->
-  req.session.userid = null
-  res.redirect '/'
 
-exports.create_session = (req, res) ->
-  Core = require "../models/core"
+login = (req, res) ->
+  res.rendr "sessions/new", pageTitle: "Login"
 
-  await Core.User.authenticateUser req.body.user.username, req.body.user.password, defer user
-  unless user instanceof Core.User
-    return res.render 'sessions/new', pageTitle: 'Admin', notice: user
+logout = (req, res) ->
+  req.logout()
+  res.redirect "/"
 
-  req.session.userid = user._id
-  res.redirect '/admin'
+
+class Strategy extends CouchStrategy
+  authRedirects:
+    successRedirect: "/admin"
+    failureRedirect: "/login"
+    failWithError: true
+
+  parseConfig: Base.parseConfig
+
+  constructor: (config) ->
+    @User = require "../models/user"
+    @User.setup config
+    server = @parseConfig config
+    super server
+    @verify = passport.authenticate "couch", @authRedirects
+
+  deserializeUser: (id, done) =>
+    @User.find id, done
+
+
+module.exports =
+  login:    login
+  logout:   logout
+  Strategy: Strategy

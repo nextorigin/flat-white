@@ -1,32 +1,45 @@
 {
-  "name": "guilherme-blog",
-  "version": "0.3.0",
-  "author": "Guilherme Defreitas Juraszek <guilherme.defreitas@gmail.com>",
-  "description": "Simple blog system",
-  "main": "./app",
+  "name": "flat-white",
+  "version": "0.9.3",
+  "author": "doublerebel",
+  "description": "Minimal NodeJS/Express/CouchDB blog in Iced CoffeeScript",
+  "main": "./lib/app",
+  "scripts": {
+    "build": "./node_modules/.bin/iced --bare --map --runtime node -o ./lib -c app/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nextorigin/flat-white.git"
+  },
   "dependencies": {
-    "body-parser": "~1.13.2",
-    "compression": "^1.6.1",
+    "cloudant-user": "^2.0.0",
     "connect-assets": "^5.1.0",
-    "consul": "^0.24.0",
+    "cookie-parser": "^1.4.1",
+    "couchapp": "^0.11.0",
+    "cradle": "^0.7.1",
+    "errify": "^1.0.0",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "formidable": "^1.0.17",
-    "i18n": "0.8.1",
+    "i18n": "0.8.2",
     "iced-runtime": "^1.0.3",
-    "jade": "^1.11.0",
     "less": "^2.6.1",
     "marked": "^0.3.5",
     "method-override": "^2.3.5",
-    "mocha": "^2.4.5",
-    "moment": "^2.12.0",
-    "mongodb": "^2.1.7",
-    "mongojs": "^2.3.0",
-    "mongoose": "^4.4.7",
-    "morgan": "^1.6.1",
+    "moment": "^2.13.0",
+    "nextorigin-express-skeleton": "^0.11.0-pugfix",
+    "passport": "^0.3.2",
+    "passport-couch": "^0.9.0",
     "response-time": "^2.3.1",
     "rss": "^1.2.1",
-    "serve-favicon": "^2.3.0"
+    "spine": "^1.6.2",
+    "spine-couch": "^1.0.0",
+    "spine-relations": "^1.0.5",
+    "xanax": "^1.0.1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "iced-coffee-script": "^108.0.11",
+    "mocha": "^2.4.5"
+  }
 }

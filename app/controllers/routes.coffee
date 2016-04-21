@@ -1,73 +1,73 @@
-home           = require './home'
-search         = require './search'
-rss            = require './rss'
-posts          = require './posts'
-about          = require './about'
-projects       = require './projects'
-session        = require './session'
-admin          = require './admin'
-admin_media    = require './admin/media'
-admin_projects = require './admin/projects'
-admin_posts    = require './admin/posts'
-admin_messages = require './admin/messages'
+express        = require "express"
+passport       = require "passport"
+Xanax          = require "xanax"
+
+home           = require "./home"
+search         = require "./search"
+RSS            = require "./rss"
+about          = require "./about"
+session        = require "./session"
+admin          = require "./admin"
+admin_media    = require "./admin/media"
+Posts          = require "./posts"
+admin_messages = require "./admin/messages"
+extend         = (require "util")._extend
 
 
 class Routes
-  @init: (@app, @Core) ->
+  constructor: (@config) ->
+    @router = express.Router()
     @addRoutes()
+
+  addRoutes: ->
+    strategy = new session.Strategy @config
+    passport.use strategy
+    passport.serializeUser strategy.serializeUser
+    passport.deserializeUser strategy.deserializeUser
+    @router.use passport.initialize()
+    @router.use passport.session()
+
+    rss = new RSS @config
+
+    @router.get  "/",                home.index
+    @router.get  "/search",          search.index
+    @router.get  "/rss.xml",         rss.index
+    @router.get  "/about",           about.index
+    @router.post "/about/message",   about.new_message
+    # @router.get  "/projects",        projects.index
+
+    @router.get  "/login",           session.login
+    @router.post "/login",           strategy.verify
+    @router.get  "/logout",          session.logout
+
+    @router.get  "/admin",           @isAuthenticated, @isAdmin, admin.index
+    @router.get  "/admin/media",     @isAuthenticated, @isAdmin, admin_media.index
+    @router.get  "/admin/messages",  @isAuthenticated, @isAdmin, admin_messages.index
+
+    posts  = new Posts @config
+    @router.use "/#{posts.name}",    @isAuthenticated
+    posts.router.get "/#{posts.name}/:id/pen", posts.find, posts.editWithPen
+    @router.use posts.router #, posts.postError
+
+    single = new Posts extend {name: "blog"}, @config
+    root = new express.Router
+    root.get     "/:id",             single.find, single.read
+    root.get     "*",                @redirectToRoot
+    @router.use root
+
     this
 
-  @addRoutes: ->
-    @app.get  '/',                home.index
-    @app.get  '/search',          search.index
-    @app.get  '/rss.xml',         rss.index
-    @app.get  '/about',           about.index
-    @app.post '/about/message',   about.new_message
-    @app.get  '/projects',        projects.index
-    @app.get  '/login',           session.login
-    @app.get  '/logout',          session.logout
-    @app.post '/login',           session.create_session
+  redirectToRoot: (req, res) -> res.redirect "/"
 
-    @app.get  '/admin',                   @isAdmin, admin.index
-    @app.get  '/admin/media',             @isAdmin, admin_media.index
-    @app.get  '/admin/projects',          @isAdmin, admin_projects.index
-    @app.get  '/admin/projects/new',      @isAdmin, admin_projects.new_project
-    @app.post '/admin/projects',          @isAdmin, admin_projects.create_project
-    @app.get  '/admin/projects/:id',      @isAdmin, admin_projects.show_project
-    @app.get  '/admin/projects/edit/:id', @isAdmin, admin_projects.edit_project
-    @app.put  '/admin/projects/:id',      @isAdmin, admin_projects.update_project
-    @app.del  '/admin/projects/:id',      @isAdmin, admin_projects.remove_project
-    @app.get  '/admin/posts',             @isAdmin, admin_posts.index
-    @app.get  '/admin/posts/new',         @isAdmin, admin_posts.new_post
-    @app.post '/admin/posts',             @isAdmin, admin_posts.create_post
-    @app.get  '/admin/posts/:id',         @isAdmin, admin_posts.show_post
-    @app.get  '/admin/posts/edit/:id',    @isAdmin, admin_posts.edit_post
-    @app.get  '/admin/posts/edit/:id/pen',@isAdmin, admin_posts.edit_post_withpen
-    @app.put  '/admin/posts/:id',         @isAdmin, admin_posts.update_post
-    @app.del  '/admin/posts/:id',         @isAdmin, admin_posts.remove_post
-    @app.get  '/admin/messages',          @isAdmin, admin_messages.index
+  health: (req, res) -> res.status(200).send "OK"
 
-    @app.get  '/:id', posts.show_post
-    @app.get  '*',    @redirectToRoot
+  isAuthenticated: (req, res, next) ->
+    return res.redirect "/login" unless req.user
+    next()
 
-    this
-
-  @redirectToRoot: (req, res) -> res.redirect '/'
-
-  @isAuthenticated: (req, res, next) ->
-    unless req.session.userid
-      res.redirect '/login'
-      false
-    true
-
-  @isAdmin: (req, res, next) =>
-    return unless @isAuthenticated arguments...
-
-    @Core.User.findOne {_id: (@Core.ObjectId req.session.userid)}, (err, user) ->
-      unless user and not err
-        return next new Error 'Unauthorized'
-
-      next() if user.admin
+  isAdmin: (req, res, next) =>
+    return next 401 unless req.user.admin
+    next()
 
 
 module.exports = Routes

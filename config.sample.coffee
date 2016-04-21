@@ -2,7 +2,10 @@
 # heroku config:add DBURL=mongodb://user:pass@host:port/database
 
 exports =
-  dbUrl: process.env['DBURL'] # OR 'mongodb://user:pass@host:port/database'
+  db_host: process.env['DB_HOST'] # OR 'mongodb://user:pass@host:port/database'
+  db_username: "admin"
+  db_password: "PASSWORD"
+  address: "127.0.0.1"
   blog_title: 'Sample Title'
   blog_description: 'Sample Blog Description'
   feed_url: 'http://blogurl.com/rss.xml'

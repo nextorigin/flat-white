@@ -1,13 +1,56 @@
-exports.show_post = (req, res) ->
-  Core  = require "../models/core"
-  urlid = req.params.id
-  error = (err) -> res.render '500', pageTitle: "Error: #{err}"
+Xanax = require "xanax"
 
-  await Core.Post.findOne({urlid: urlid}).exec defer err, post
-  return error err if err
-  return res.render('404', pageTitle: 'Not Found') unless post
 
-  res.render 'blog/show',
-    pageTitle: "#{Core.config.blog_title}-#{post.title}"
-    post: post
+class PostsController extends Xanax
+  constructor: (config) ->
+    @Post    = require "../models/post"
+    @Post.setup config
 
+    super Model: @Post, name: config.name
+
+  render: (res, path, response) =>
+    res.format
+      html: =>
+        switch path
+          when "#{@name}/create", "#{@name}/update", "#{@name}/patch", "#{@name}/delete"
+            return res.redirect "/#{@name}"
+
+        if Array.isArray response
+          wrapper = {}
+          wrapper[@name] = response
+
+        res.rendr path, wrapper or response
+
+      default: =>
+        res.rendr path, response
+
+  index: (req, res, next) ->
+    res.locals.pageTitle = "Posts"
+    super
+
+  new: (req, res, next) ->
+    res.locals.pageTitle = "New Post"
+    super
+
+  read: (req, res, next) ->
+    res.locals.pageTitle = "#{res.locals.record.title}"
+    super
+
+  edit: (req, res, next) ->
+    res.locals.pageTitle = "Edit Post: #{res.locals.record.title}"
+    super
+
+  editWithPen: (req, res, next) =>
+    res.locals.pageTitle = "Edit Post: #{res.locals.record.title}"
+    @respond res, "posts/edit_withpen", res.locals.record
+
+  postError: (err, req, res, next) =>
+    {referer}  = req.headers
+    previous   = referer?[(referer.lastIndexOf "/")..]
+    previous or= "/error"
+
+    res.statusCode or= err.status or 500
+    @respond res, "#{@name}#{previous}", notice: "Error: #{err}"
+
+
+module.exports = PostsController

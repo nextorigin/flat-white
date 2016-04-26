@@ -1,4 +1,5 @@
-Xanax = require "xanax"
+Xanax  = require "xanax"
+errify = require "errify"
 
 
 class PostsController extends Xanax
@@ -43,6 +44,15 @@ class PostsController extends Xanax
   editWithPen: (req, res, next) =>
     res.locals.pageTitle = "Edit Post: #{res.locals.record.title}"
     @respond res, "posts/edit_withpen", res.locals.record
+
+  more: (req, res, next) =>
+    res.locals.pageTitle = "Older Posts"
+    ideally = errify next
+    {page}  = req.params
+    page    = Number page
+
+    await @Model.findAllByAttribute "date", 10, {skip: (page - 1) * 10}, ideally defer records
+    @respond res, "blog/index", records...
 
   postError: (err, req, res, next) =>
     {referer}  = req.headers

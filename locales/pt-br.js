@@ -1,5 +1,5 @@
 {
-  "Old Posts": "Posts Antigos",
+  "Older Posts": "Posts Antigos",
   "Blog": "Blog",
   "Projects": "Projetos",
   "About": "Sobre",

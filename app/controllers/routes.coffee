@@ -47,11 +47,12 @@ class Routes
     posts  = new Posts @config
     @router.use "/#{posts.name}",    @isAuthenticated
     posts.router.get "/#{posts.name}/:id/pen", posts.find, posts.editWithPen
+    posts.router.get "/page/:page",  posts.more
     @router.use posts.router #, posts.postError
 
-    single = new Posts extend {name: "blog"}, @config
+    blog = new Posts extend {name: "blog"}, @config
     root = new express.Router
-    root.get     "/:id",             single.find, single.read
+    root.get     "/:id",             blog.find, blog.read
     root.get     "*",                @redirectToRoot
     @router.use root
 

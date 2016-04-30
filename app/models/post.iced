@@ -53,6 +53,7 @@ class Post extends Base
   save: ->
     @tags = @tags.split "," if @tags and not Array.isArray @tags
     @tags[i] = tag.trim().toLowerCase() for tag, i in @tags
+    @date = (new Date @date).toISOString()
     super
 
 

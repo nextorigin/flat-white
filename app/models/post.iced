@@ -42,8 +42,8 @@ class Post extends Base
     @db.post "_find", selection, cb
 
   constructor: (attrs = {}) ->
-    attrs.id   = utils.doDashes attrs.title or ""
-    attrs.date = (new Date).toISOString()
+    attrs.id   or= utils.doDashes attrs.title or ""
+    attrs.date or= (new Date).toISOString()
     super attrs
 
   update: ->

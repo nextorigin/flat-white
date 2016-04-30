@@ -1,5 +1,5 @@
 utils =
-  doDashes: (str) -> str.replace(/[^a-z0-9]+/gi, '-').replace(/^-*|-*$/g, '').toLowerCase()
+  dashify: (str) -> str.replace(/[^a-z0-9]+/gi, '-').replace(/^-*|-*$/g, '').toLowerCase()
 
   extend: (target, sources...) ->
     target[key] = val for key, val of source for source in sources

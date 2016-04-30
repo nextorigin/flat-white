@@ -1,7 +1,7 @@
-errify = require "errify"
-Base   = require "./base"
-utils  = require "../utils"
-extend = (require "util")._extend
+errify    = require "errify"
+Base      = require "./base"
+{dashify} = require "../utils"
+extend    = (require "util")._extend
 
 
 class Post extends Base
@@ -42,12 +42,12 @@ class Post extends Base
     @db.post "_find", selection, cb
 
   constructor: (attrs = {}) ->
-    attrs.id   or= utils.doDashes attrs.title or ""
+    attrs.id   or= dashify attrs.title or ""
     attrs.date or= (new Date).toISOString()
     super attrs
 
   update: ->
-    @id = utils.doDashes @title
+    @id = dashify @title
     super
 
   save: ->

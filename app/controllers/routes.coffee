@@ -2,7 +2,7 @@ express        = require "express"
 passport       = require "passport"
 Xanax          = require "xanax"
 
-home           = require "./home"
+Home           = require "./home"
 search         = require "./search"
 RSS            = require "./rss"
 about          = require "./about"
@@ -27,7 +27,8 @@ class Routes
     @router.use passport.initialize()
     @router.use passport.session()
 
-    rss = new RSS @config
+    rss  = new RSS @config
+    home = new Home @config
 
     @router.get  "/",                home.index
     @router.get  "/search",          search.index

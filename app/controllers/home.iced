@@ -1,15 +1,22 @@
 errify = require "errify"
 
 
-exports.index = (req, res, next) ->
-  Post    = require "../models/post"
-  error   = (err) -> res.render 'blog/index', pageTitle: "Error: #{err}", posts: []
-  ideally = errify error
+class HomeController
+  constructor: (@config) ->
+    @Post = require "../models/post"
 
-  await Post.tags ideally defer tags
-  await Post.findAllByAttribute "date", 10, ideally defer posts
+  index: (req, res, next) =>
+    view    = "blog/index"
+    error   = (err) -> res.render view, pageTitle: "Error: #{err}", posts: []
+    ideally = errify error
 
-  res.render 'blog/index',
-    pageTitle: 'Blog'
-    tags:     tags.sort()
-    posts:    posts
+    await @Post.tags ideally defer tags
+    await @Post.findAllByAttribute "date", 10, ideally defer posts
+
+    res.render view,
+      pageTitle: @config.blog_title
+      tags:      tags.sort()
+      posts:     posts
+
+
+module.exports = HomeController

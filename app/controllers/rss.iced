@@ -4,10 +4,11 @@ errify = require "errify"
 
 class RssController
   constructor: (@config) ->
+    @Post = require "../models/post"
 
-  index: (req, res, next) ->
-    Post  = require "../models/post"
-    feed  = new RSS
+  index: (req, res, next) =>
+    ideally = errify next
+    feed = new RSS
       title:       @config.blog_title
       description: @config.blog_description
       feed_url:    @config.feed_url
@@ -15,7 +16,7 @@ class RssController
       image_url:   @config.site_image_url
       author:      @config.site_author
 
-    await Post.findAll ideally defer posts
+    await @Post.findAll ideally defer posts
     for post in posts
       feed.item
         title: post.title

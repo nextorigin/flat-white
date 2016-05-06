@@ -43,7 +43,9 @@ class FlatWhite extends Skeleton
     delete req.body._method
     method
 
-  initMiddleware: ->
+  loadMiddleware: ->
+    super
+
     @debug "loading middleware"
     # method-override must come before any middleware that relies on METHOD
     @app.use override @override
@@ -82,7 +84,6 @@ class FlatWhite extends Skeleton
 
   bindRoutes: ->
     @debug "loading routes"
-    @initMiddleware()
     @app.use @localMiddleware
     @routes = new Routes @config
     @app.use @routes.router

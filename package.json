@@ -1,6 +1,6 @@
 {
   "name": "flat-white",
-  "version": "0.9.10",
+  "version": "0.9.11",
   "author": "doublerebel",
   "description": "Minimal NodeJS/Express/CouchDB blog in Iced CoffeeScript",
   "main": "./lib/app",

@@ -1,6 +1,6 @@
 {
   "name": "flat-white",
-  "version": "0.9.11",
+  "version": "0.10.1",
   "author": "doublerebel",
   "description": "Minimal NodeJS/Express/CouchDB blog in Iced CoffeeScript",
   "main": "./lib/app",
@@ -27,7 +27,7 @@
     "marked": "^0.3.5",
     "method-override": "^2.3.5",
     "moment": "^2.13.0",
-    "nextorigin-express-skeleton": "^0.15.0-pugfix",
+    "nextorigin-express-skeleton": "^0.15.0",
     "passport": "^0.3.2",
     "passport-couch": "^0.9.0",
     "response-time": "^2.3.1",

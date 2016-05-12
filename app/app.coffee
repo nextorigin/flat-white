@@ -61,10 +61,10 @@ class FlatWhite extends Skeleton
     @app.set "views", views_dir
     @app.set "view options", pretty: true
 
-    @app.use cookieParser()
     @app.use session
+      name:   @config.session_name  or "flat-white"
       secret: @config.crypto_key
-      store:  session.MemoryStore reapInterval: 60000 * 10
+      store:  @config.session_store or session.MemoryStore reapInterval: 60000 * 10
       resave: false
       saveUninitialized: false
 

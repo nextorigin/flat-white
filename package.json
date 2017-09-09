@@ -20,15 +20,15 @@
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "formidable": "^1.0.17",
-    "i18n": "0.8.2",
+    "i18n": "0.8.3",
     "iced-runtime": "^1.0.3",
     "less": "^2.6.1",
     "marked": "^0.3.5",
     "method-override": "^2.3.5",
     "moment": "^2.13.0",
-    "nextorigin-express-skeleton": "^0.15.1",
-    "passport": "^0.3.2",
-    "passport-couch": "^0.9.0",
+    "nextorigin-express-skeleton": "^0.16.1",
+    "passport": "^0.4.0",
+    "passport-couch": "^0.10.2",
     "response-time": "^2.3.1",
     "rss": "^1.2.1",
     "spine": "^1.6.2",
@@ -39,6 +39,6 @@
   "license": "MIT",
   "devDependencies": {
     "iced-coffee-script": "^108.0.11",
-    "mocha": "^2.4.5"
+    "mocha": "^3.5.0"
   }
 }
